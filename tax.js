@@ -1,5 +1,5 @@
-// 100  = 90
-// (150 * 10/100) = 15
+// // 100  = 90
+// // (150 * 10/100) = 15
 
 function calcPercentage(amount, percentAmount) {
   return (amount * percentAmount) / 100;
@@ -30,9 +30,10 @@ function marriedRelease(isMarried, noOfChild) {
 }
 
 function totalRelase(yearlyIncome, noOfParent, isMarried, noOfChild) {
-  const SSB = 72000;
+  const SSB = 72000; // priemium
 
   const self = selfRelease(yearlyIncome);
+
   const parental = parentalRelease(noOfParent);
   const marryRelease = marriedRelease(isMarried, noOfChild);
 
@@ -43,7 +44,7 @@ function totalRelase(yearlyIncome, noOfParent, isMarried, noOfChild) {
   return self + parental + marryRelease + SSB;
 }
 
-const yearlyIncome = 1632000 * 12;
+const yearlyIncome = 2000000 * 12;
 const total = totalRelase(yearlyIncome, 2, true, 2);
 
 function calcTaxAmount(yearlyIncome, totalRelase) {
@@ -52,22 +53,39 @@ function calcTaxAmount(yearlyIncome, totalRelase) {
 
 const taxAmount = calcTaxAmount(yearlyIncome, total);
 
-console.log("TAO", total.toLocaleString(), taxAmount.toLocaleString());
+console.log("TOTAL TAX RELEASE", total.toLocaleString());
+console.log("TAXABLE AMOUNT", taxAmount.toLocaleString());
 
-function calcPayableTax(taxAmount) {
-  if (taxAmount > 0 && taxAmount <= 2000000) {
-    return 0;
-  } else if (taxAmount > 2000000 && taxAmount <= 5000000) {
-    return calcPercentage(taxAmount, 5);
-  } else if (taxAmount > 5000000 && taxAmount <= 10000000) {
-    return calcPercentage(taxAmount, 10);
-  } else if (taxAmount > 10000000 && taxAmount <= 20000000) {
-    console.log("DD", taxAmount);
-    return taxAmount - calcPercentage(taxAmount, 15);
-  } else {
-    return calcPercentage(taxAmount, 25);
+function calcPayableTax(total) {
+  // let result = 0;
+  let taxAmount = 0;
+  if (total > 0 && total <= 2000000) {
+    taxAmount += 0;
   }
+
+  if (total > 2000000 && total <= 5000000) {
+    taxAmount += calcPercentage(total - 2000000, 5);
+  }
+
+  if (total > 5000000 && total <= 10000000) {
+    taxAmount += calcPayableTax(total - 5000000, 10);
+  }
+
+  if (total > 10000000 && total <= 20000000) {
+    taxAmount += calcPayableTax(total - 10000000, 15);
+  }
+
+  if (total > 20000000 && total <= 30000000) {
+    taxAmount += calcTaxAmount(total - 20000000, 20);
+  }
+
+  if (total > 30000000) {
+    taxAmount += calcTaxAmount(total - 30000000, 25);
+  }
+
+  console.log("YEARLY TAX", taxAmount);
+  return taxAmount / 12;
 }
 
-const yearlyTax = calcPayableTax(taxAmount);
-console.log("YEAR", yearlyTax);
+const monthTax = calcPayableTax(taxAmount);
+console.log("MONTHLY TAX", monthTax);
